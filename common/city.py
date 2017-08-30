@@ -122,6 +122,8 @@ class City(object):
             del self.nodes[node.id].nbrs[idx]
 
     # add turning links
+    for node in self.nodes.values():
+      pass
     print('adding turning links...')
 
 
