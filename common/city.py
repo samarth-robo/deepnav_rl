@@ -55,6 +55,24 @@ def other_directions(dir):
     raise ValueError
   return other_dirs
 
+def immediate_other_dirs(dir, other_dirs):
+  dir2int = {'N': 0, 'E': 1, 'S': 2, 'W': 3}
+  int2dir = {v: k for k,v in dir2int.items()}
+  out = []
+  # sweep right
+  for i in range(dir2int[dir], 4):
+    idir = int2dir[i]
+    if idir in other_dirs:
+      out.append(idir)
+      break
+  # sweep left
+  for i in range(dir2int[dir], -1, -1):
+    idir = int2dir[i]
+    if idir in other_dirs:
+      out.append(idir)
+      break
+  return out
+
 class City(object):
   def __init__(self, name):
     self.name = name
@@ -112,8 +130,7 @@ class City(object):
         if nbr_id not in self.nodes:
           # try other directions
           nbr_id, dir = nbr_id.split('_')
-          other_dirs = other_directions(dir)
-          for other_dir in other_dirs:
+          for other_dir in other_directions(dir):
             other_nbr_id = '{:s}_{:s}'.format(nbr_id, other_dir)
             if other_nbr_id in self.nodes:
               self.nodes[node.id].nbrs[idx] = other_nbr_id
@@ -123,7 +140,12 @@ class City(object):
 
     # add turning links
     for node in self.nodes.values():
-      pass
+      node_id, dir = node.id.split('_')
+      for other_dir in immediate_other_dirs(dir, other_directions(dir)):
+        other_node_id = '{:s}_{:s}'.format(node_id, other_dir)
+        if other_node_id in self.nodes:
+          self.nodes[node.id].nbrs.append(self.nodes[other_node_id])
+
     print('adding turning links...')
 
 
